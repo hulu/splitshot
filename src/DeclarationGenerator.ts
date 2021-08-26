@@ -136,7 +136,14 @@ export default class DeclarationGenerator {
             let dottedImportedName = variable.split("."); // TODO: Figure out how to handle `Foo.Bar = require("bar")`!
             let importedName = dottedImportedName[dottedImportedName.length - 1];
             const exportedName = this.getExportedProperty(variable);
-            if (importedName === exportedName) {
+            if (importedName === "" && exportedName === "") {
+              const properties = node.variable.base.properties[0];
+              if (properties?.operatorToken?.value === ":") {
+                importedName = properties?.base.value;
+              } else {
+                importedName = properties?.variable?.base.value ?? properties?.base.value;
+              }
+            } else if (importedName === exportedName) {
                 importedName = "_" + importedName;
             }
             this.requiredModules.push(importedName);
@@ -252,8 +259,9 @@ export default class DeclarationGenerator {
                 func.parameters = parameters || [];
                 producedDeclarations = [ func ];
             } else if (node.value.base && node.value.base.constructor.name === "IdentifierLiteral" && this.requiredModules.includes(exportedProperty)) {
+                // TODO:  is this still relevant?  the tests break without this
                 // previously-imported modules don't get new names; just export them.
-                let namedExport = dom.create.exportName(exportedProperty);
+                let namedExport = dom.create.exportName(exportedProperty, exportedProperty);
                 producedDeclarations = [ namedExport ];
             } else if (this.isRequire(node.value) || this.knownClasses.has(value)) {
                 let namedExport: dom.ExportNameDeclaration;

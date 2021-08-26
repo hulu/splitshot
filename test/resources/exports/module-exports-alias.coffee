@@ -25,4 +25,5 @@ ModuleName.ClassInSession = new TheMathematicsOfQuantumNeutrinoFields()
 module.exports.InlineClass = class InternalName
     name: "Phillip J. Fry"
 
-ModuleName.Reexport = require("./simple-module")
+{Reexport} = require('./simple-module')
+ModuleName.Reexport = Reexport

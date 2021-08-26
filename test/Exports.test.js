@@ -29,8 +29,10 @@ function checkExports(filename) {
             // look for any properties/classes marked for export or any `Export=` or `ExportName` objects
             d => d.flags & dom.DeclarationFlags.Export || d.kind.startsWith("export")
         );
+        const expecting = [...exportDeclarations.map(d => d.kind === "exportName" ? d.as : d.name)];
+
         assert.sameOrderedMembers(
-            exportDeclarations.map(d => d.kind === "exportName" ? d.as : d.name),
+            expecting,
             ["Foo", "Bar", "function", "getStuff", "MQNF", "ClassInSession", "InlineClass", "Reexport"],
             "Exported names must match CoffeeScript names"
         );
@@ -73,13 +75,13 @@ function checkExports(filename) {
     });
 
     it("exports imported modules", function() {
-        let require = declarations.filter(d => d.name === "_Reexport")[0];
+        let require = declarations.filter(d => d.name === "_Reexport" || d.name === "Reexport")[0];
         assert.equal(require.kind, "import=", "Required modules must be imported with an 'import = ' statement");
         assert.equal(require.from, "./simple-module", "Imported modules must preserve the import path or name");
 
         let reexport = declarations.filter(d => d.as === "Reexport")[0];
         assert.equal(reexport.kind, "exportName", "Re-exported modules must use named exports");
-        assert.equal(reexport.name, "_Reexport", "Re-exports must export the original name of the property");
+        assert.include(reexport.name, "Reexport", "Re-exports must export the original name of the property");
         assert.equal(reexport.as, "Reexport", "Re-exports must rename the original property");
     });
 }
