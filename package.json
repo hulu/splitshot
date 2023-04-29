@@ -43,6 +43,6 @@
   "dependencies": {
     "coffee-script": "^1.12.3",
     "dts-dom": "^0.1.25",
-    "yargs": "^6.6.0"
+    "yargs": "^17.7.2"
   }
 }
